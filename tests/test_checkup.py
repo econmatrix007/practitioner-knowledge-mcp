@@ -213,6 +213,8 @@ def test_stubbed_run_writes_report_ticket_and_ics_and_upgrades_nothing(
     conn.close()
     monkeypatch.setenv("KNOWLEDGE_MCP_BACKUP_DIR", str(tmp_path / "backups"))
     monkeypatch.setattr(checkup, "SERVICE_PLIST", tmp_path / "absent.plist")
+    sent: list[str] = []  # record notifications instead of showing them (osascript on macOS)
+    monkeypatch.setattr(checkup, "notify", sent.append)
     out = tmp_path / "maintenance"
     before = snapshot()
     args = [
@@ -235,8 +237,8 @@ def test_stubbed_run_writes_report_ticket_and_ics_and_upgrades_nothing(
     assert "Saturday 10 October 2026" in ticket.read_text()
     assert (out / "ticket-mcp-2.3.0.ics").read_bytes().count(b"\r\n") > 10
     assert list((tmp_path / "backups").glob("ideas-*.db")), "backup runs before checkup"
-    printed = capsys.readouterr().out
-    assert "Notification: 1 upgrade proposed for Sat Oct 10; DB healthy" in printed
+    assert sent == ["1 upgrade proposed for Sat Oct 10; DB healthy; backup 0 days old"]
+    capsys.readouterr()
 
     # A second run keeps the existing ticket instead of regenerating it.
     ticket.write_text("my notes")
@@ -256,3 +258,20 @@ def test_validate_policy_prints_schedule(capsys) -> None:
     path = str(config.REPO_ROOT / "maintenance.example.toml")
     assert checkup.main(["--policy", path, "--validate-policy"]) == 0
     assert '"weekday": 0, "hour": 8, "minute": 0' in capsys.readouterr().out
+
+
+def test_notify_uses_osascript_on_macos(monkeypatch: pytest.MonkeyPatch) -> None:
+    calls: list[list[str]] = []
+    monkeypatch.setattr(checkup.sys, "platform", "darwin")
+    monkeypatch.setattr(checkup.subprocess, "run", lambda cmd, **kw: calls.append(cmd))
+    checkup.notify('Say "hi"; 1 upgrade')
+    assert calls[0][:2] == ["osascript", "-e"]
+    assert calls[0][2] == (
+        'display notification "Say \\"hi\\"; 1 upgrade" with title "Knowledge MCP checkup"'
+    )
+
+
+def test_notify_prints_elsewhere(monkeypatch: pytest.MonkeyPatch, capsys) -> None:
+    monkeypatch.setattr(checkup.sys, "platform", "linux")
+    checkup.notify("hello")
+    assert capsys.readouterr().out == "Notification: hello\n"
