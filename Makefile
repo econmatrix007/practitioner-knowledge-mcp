@@ -6,7 +6,7 @@ UV ?= uv
 INSPECTOR ?= @modelcontextprotocol/inspector@2.9.0
 
 .DEFAULT_GOAL := help
-.PHONY: help install hooks lint format test guard check init-db seed run-stdio run-http inspect smoke clean
+.PHONY: help install hooks lint format test guard check init-db seed run-stdio run-http inspect smoke frameworks clean
 
 help: ## List available targets
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-10s %s\n", $$1, $$2}'
@@ -55,6 +55,9 @@ inspect: ## Open MCP Inspector in your browser, connected to this server (needs 
 
 smoke: ## Launch the server like Claude Desktop does and test every read-only tool
 	$(UV) run python scripts/smoke_stdio.py
+
+frameworks: ## List the frameworks the server can see
+	@$(UV) run python scripts/list_frameworks.py
 
 clean: ## Remove caches and build output (keeps .venv and your data)
 	rm -rf .pytest_cache .ruff_cache build dist
