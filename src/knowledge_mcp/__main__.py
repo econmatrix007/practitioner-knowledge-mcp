@@ -1,7 +1,7 @@
 """Command-line entry point.
 
-    uv run knowledge-mcp --transport stdio
-    uv run python -m knowledge_mcp --transport stdio
+    uv run knowledge-mcp --transport stdio     local client such as Claude Desktop
+    uv run knowledge-mcp --transport http      always-on host (see http_server.py)
 
 In stdio mode, stdout carries the MCP protocol, so all logging goes to stderr.
 """
@@ -23,7 +23,8 @@ def main(argv: list[str] | None = None) -> int:
         "--transport",
         choices=["stdio", "http"],
         default="stdio",
-        help="stdio for a local client such as Claude Desktop (default).",
+        help="stdio for a local client such as Claude Desktop (default); "
+        "http for an always-on host.",
     )
     parser.add_argument("--version", action="version", version=f"knowledge-mcp {__version__}")
     args = parser.parse_args(argv)
@@ -34,18 +35,22 @@ def main(argv: list[str] | None = None) -> int:
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
     )
 
-    if args.transport == "http":
-        print("The HTTP transport arrives in Phase 4. Use --transport stdio.", file=sys.stderr)
-        return 2
-
+    from knowledge_mcp.config import load_settings
+    from knowledge_mcp.http_server import check_bind, run_http
     from knowledge_mcp.server import create_server
 
     try:
-        app = create_server()
+        settings = load_settings()
+        if args.transport == "http":
+            check_bind(settings)
+        app = create_server(settings)
     except Exception as exc:  # startup errors: show a clear message, not a traceback
         print(f"knowledge-mcp could not start: {exc}", file=sys.stderr)
         return 1
-    app.run(transport="stdio")
+    if args.transport == "http":
+        run_http(app, settings)
+    else:
+        app.run(transport="stdio")
     return 0
 
 
