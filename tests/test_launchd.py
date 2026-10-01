@@ -104,3 +104,41 @@ def test_plugins_are_passed_to_the_service() -> None:
     plugin = str(config.REPO_ROOT / "examples" / "example_plugin.py")
     env = render("--plugins", plugin)["EnvironmentVariables"]
     assert env["KNOWLEDGE_MCP_PLUGINS"] == plugin
+
+
+# --- Weekly checkup ---------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("day", "launchd_weekday"),
+    [("Monday", 1), ("Saturday", 6), ("Sunday", 0)],  # launchd counts Sunday as 0
+)
+def test_checkup_schedule_follows_policy(tmp_path, day: str, launchd_weekday: int) -> None:
+    policy = tmp_path / "maintenance.toml"
+    policy.write_text(f'[schedule]\ncheckup_day = "{day}"\ncheckup_time = "07:45"\n')
+    plist = render_target("checkup", "--policy", str(policy))
+    assert plist["StartCalendarInterval"] == {"Weekday": launchd_weekday, "Hour": 7, "Minute": 45}
+    assert plist["Label"] == "com.example.knowledge-mcp-checkup"
+    assert plist["RunAtLoad"] is False
+    assert plist["ProgramArguments"][1:] == ["-m", "knowledge_mcp.checkup", "--policy", str(policy)]
+    assert plist["StandardErrorPath"].endswith("/Library/Logs/knowledge-mcp/checkup.err.log")
+
+
+def test_checkup_dry_run_uses_example_policy_when_none_exists(tmp_path) -> None:
+    plist = render_target("checkup", "--policy", str(tmp_path / "missing.toml"))
+    assert plist["StartCalendarInterval"] == {"Weekday": 1, "Hour": 8, "Minute": 0}
+
+
+def test_checkup_rejects_invalid_policy(tmp_path) -> None:
+    policy = tmp_path / "maintenance.toml"
+    policy.write_text('[schedule]\ncheckup_day = "Someday"\n')
+    result = run("install", "checkup", "--dry-run", "--policy", str(policy))
+    assert result.returncode != 0
+    assert "checkup_day must be a weekday" in result.stderr
+    assert "Nothing was installed" in result.stderr and "Traceback" not in result.stderr
+
+
+def render_target(target: str, *args: str) -> dict[str, Any]:
+    result = run("install", target, "--dry-run", *args)
+    assert result.returncode == 0, result.stderr
+    return plistlib.loads(result.stdout.encode())
