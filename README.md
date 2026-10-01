@@ -180,12 +180,13 @@ for this server looks like
 }
 ```
 
-[docs/02-connect-claude-desktop.md](docs/02-connect-claude-desktop.md) has a
-one-paste command that adds this entry for you, fills in your paths, keeps any
-servers you already have, and backs up the file first.
+Quit Claude Desktop with **Cmd-Q** first: an open Claude Desktop can write its
+own copy of the file back and drop your change. Then use the one-paste command in
+[docs/02-connect-claude-desktop.md](docs/02-connect-claude-desktop.md). It adds
+this entry for you, fills in your paths, keeps any servers you already have, and
+backs up the file first.
 
-Then quit Claude Desktop with **Cmd-Q** (closing the window is not enough) and
-reopen it. In a new chat, ask:
+Reopen Claude Desktop. In a regular new chat, ask:
 
 > Use practitioner-knowledge to search my ideas for supply chain.
 

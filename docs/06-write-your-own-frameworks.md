@@ -110,7 +110,7 @@ block next to `KNOWLEDGE_MCP_DB`:
 }
 ```
 
-Quit and reopen Claude Desktop afterward.
+Quit Claude Desktop with Cmd-Q before you edit the file, and reopen it afterward.
 
 ## Limits and safety
 

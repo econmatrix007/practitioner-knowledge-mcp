@@ -140,3 +140,18 @@ def test_migrate_command_cannot_run_itself() -> None:
     assert "disable-model-invocation: true" in text
     for stop in ("Merge into `main`?", "Restart the always-on service", "Close the ticket?"):
         assert stop in text
+
+
+def test_process_checks_are_scoped_to_the_current_user() -> None:
+    """pgrep without -u sees other accounts' apps (for example under Fast User Switching)."""
+    for page in PAGES:
+        for line in page.read_text().splitlines():
+            if "pgrep" in line:
+                assert '-u "$USER"' in line, f"{page.name}: unscoped pgrep: {line.strip()}"
+
+
+def test_claude_config_edits_say_quit_first() -> None:
+    guide = (REPO / "docs" / "02-connect-claude-desktop.md").read_text()
+    quit_at = guide.index("quit Claude Desktop completely")
+    assert quit_at < guide.index("python3 - <<'PYEOF'"), "quit must come before the edit"
+    assert "regular new chat" in guide

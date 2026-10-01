@@ -45,7 +45,17 @@ command adds the entry for you. It backs up your settings first, never changes
 other entries, and refuses to overwrite an existing `practitioner-knowledge`
 entry.
 
-Run it from the project folder, and paste the whole block at once:
+**First, quit Claude Desktop completely** with **Cmd-Q**. If it is open while you
+change its settings file, it can write its own copy back later and your new
+entry is lost. Check that it has quit:
+
+```bash
+pgrep -x -u "$USER" Claude >/dev/null && echo "still running" || echo "not running"
+```
+
+Expected: `not running`
+
+Then run this from the project folder, pasting the whole block at once:
 
 ```bash
 python3 - <<'PYEOF'
@@ -73,7 +83,14 @@ PYEOF
 Expected: `Added practitioner-knowledge. Servers:` followed by the names of all
 your servers.
 
-Check that the file is still valid:
+Check that the entry is there and the file is still valid:
+
+```bash
+grep -c '"practitioner-knowledge"' ~/Library/Application\ Support/Claude/claude_desktop_config.json
+```
+
+Expected: `1`
+
 
 ```bash
 python3 -m json.tool ~/Library/Application\ Support/Claude/claude_desktop_config.json > /dev/null && echo valid
@@ -81,10 +98,11 @@ python3 -m json.tool ~/Library/Application\ Support/Claude/claude_desktop_config
 
 Expected: `valid`
 
-## 3. Restart Claude Desktop
+## 3. Open Claude Desktop
 
-Quit Claude Desktop completely with **Cmd-Q**. Closing the window is not
-enough, because the app keeps running in the background. Then open it again.
+Open Claude Desktop again. (If you ever change the settings later, quit it with
+**Cmd-Q** first: closing the window is not enough, because the app keeps
+running in the background.)
 
 Claude Desktop starts the server and writes a log. Check that the log exists:
 
@@ -99,7 +117,7 @@ quit with Cmd-Q, then try again.
 
 ## 4. Try it
 
-Open a new chat and ask:
+Open a **regular new chat** and ask:
 
 > Use practitioner-knowledge to search my ideas for supply chain.
 
@@ -147,6 +165,8 @@ and `archived`. Nothing is ever deleted by a tool; archive an idea instead.
 
 | Symptom | Fix |
 |---|---|
+| Claude says the server "isn't attached" or asks for folder access | The prompt went into a window that does not load your local servers, or the entry is missing. Use a regular new chat, and repeat the `grep -c` check from step 2. |
+| The `grep -c` check prints `0` | The entry was lost, usually because Claude Desktop was open during step 2. Quit it with Cmd-Q and repeat step 2. |
 | No `mcp-server-practitioner-knowledge.log` | The entry is missing or Claude Desktop was not fully quit. Repeat steps 2 and 3. |
 | Claude says it has no such tool | Open Settings, then Connectors or Developer, and check that practitioner-knowledge is enabled |
 | A red error badge on the server | Read the log: `tail -40 ~/Library/Logs/Claude/mcp-server-practitioner-knowledge.log` |

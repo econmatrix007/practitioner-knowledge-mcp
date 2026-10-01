@@ -106,7 +106,8 @@ Expected: `review_queue` appears in the tool list, and every check passes.
 
 ## 3. Load it in Claude Desktop
 
-Add the plugin to the `env` block of the server's entry in Claude Desktop's
+Quit Claude Desktop with **Cmd-Q** first. Then add the plugin to the `env` block
+of the server's entry in Claude Desktop's
 settings file. This command does it for you and backs up the file first:
 
 ```bash
@@ -122,7 +123,7 @@ print("Plugins:", entry["env"]["KNOWLEDGE_MCP_PLUGINS"])
 PYEOF
 ```
 
-Quit Claude Desktop with Cmd-Q and reopen it. Then ask:
+Open Claude Desktop again. Then ask:
 
 > Use practitioner-knowledge to show my review queue.
 
