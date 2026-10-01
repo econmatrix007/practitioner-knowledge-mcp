@@ -18,14 +18,12 @@ from knowledge_mcp.server import create_server
 REPO = config.REPO_ROOT
 README = REPO / "README.md"
 DOCS = sorted((REPO / "docs").glob("*.md"))
-PAGES = [README, *DOCS]
+COMMUNITY = [REPO / n for n in ("SECURITY.md", "SUPPORT.md", "CONTRIBUTING.md")]
+PAGES = [README, *DOCS, *COMMUNITY]
 
 # Files the docs already link to that later phases create. Remove each entry
 # when its file lands; the test then guards that link like any other.
 PENDING = {
-    "SECURITY.md",  # Phase 7
-    "SUPPORT.md",  # Phase 7
-    "CONTRIBUTING.md",  # Phase 7
     "docs/09-maintenance-and-upgrades.md",  # Phase 8
 }
 
@@ -63,7 +61,9 @@ def test_make_targets_mentioned_in_docs_exist() -> None:
             assert target in targets, f"{page.name} mentions missing target: make {target}"
 
 
-@pytest.mark.parametrize("page", [README, REPO / "docs" / "08-security.md"], ids=lambda p: p.name)
+@pytest.mark.parametrize(
+    "page", [README, REPO / "docs" / "08-security.md", REPO / "SECURITY.md"], ids=lambda p: p.name
+)
 def test_no_telemetry_statement_is_verbatim(page: Path) -> None:
     assert NO_TELEMETRY in squash(page.read_text())
 
@@ -118,3 +118,7 @@ def test_plugin_code_in_guide_runs(tmp_path: Path, isolated_env: Path) -> None:
     data = ok.structured_content or json.loads(ok.content[0].text)
     assert [r["id"] for r in data["results"]] == [1]  # idea 1 is 'developing'
     assert bad.is_error and "days must be" in bad.content[0].text
+
+
+def test_code_of_conduct_has_no_unfilled_template_marker() -> None:
+    assert "[INSERT CONTACT METHOD]" not in (REPO / "CODE_OF_CONDUCT.md").read_text()
