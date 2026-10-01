@@ -6,7 +6,7 @@ UV ?= uv
 INSPECTOR ?= @modelcontextprotocol/inspector@2.9.0
 
 .DEFAULT_GOAL := help
-.PHONY: help install hooks lint format test guard check init-db seed run-stdio inspect clean
+.PHONY: help install hooks lint format test guard check init-db seed run-stdio inspect smoke clean
 
 help: ## List available targets
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-10s %s\n", $$1, $$2}'
@@ -49,6 +49,9 @@ run-stdio: ## Run the server over stdio (what Claude Desktop launches); Ctrl-C t
 # The server defaults to stdio, so the Inspector gets a command with no flags to misparse.
 inspect: ## Open MCP Inspector in your browser, connected to this server (needs Node.js)
 	npx -y $(INSPECTOR) $(UV) run knowledge-mcp
+
+smoke: ## Launch the server like Claude Desktop does and test every read-only tool
+	$(UV) run python scripts/smoke_stdio.py
 
 clean: ## Remove caches and build output (keeps .venv and your data)
 	rm -rf .pytest_cache .ruff_cache build dist
