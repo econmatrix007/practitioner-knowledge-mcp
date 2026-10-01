@@ -15,8 +15,9 @@ for practitioners rather than programmers.
   `search_ideas`, `list_ideas`, `idea_stats`) and two for frameworks
   (`list_frameworks`, `get_framework`).
 - **SQLite storage** with an FTS5 full-text index over title, domain, problem,
-  insight, assumptions, and tags. Search ranks by BM25 and falls back from
-  all words to any word. Forward-only schema migrations.
+  insight, assumptions, and tags. Search ranks by BM25, falls back from all
+  words to any word, and returns a snippet from the idea's own text plus the
+  fields that matched. Forward-only schema migrations.
 - **Markdown frameworks** with YAML front matter, read from an allow-list built
   from the frameworks folder. Three examples: pre-mortem, assumption audit, and
   a five-case business case.

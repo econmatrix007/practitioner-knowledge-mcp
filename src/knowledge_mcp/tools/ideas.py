@@ -108,9 +108,11 @@ def register(app: MCPServer, settings: Settings) -> None:
         limit: Annotated[int, Field(description="Maximum results, 1 to 100.", ge=1)] = 10,
     ) -> dict[str, Any]:
         """Full-text search across titles, domains, problems, insights, assumptions, and tags.
-        Results are ranked best match first and include a snippet with matched words in
-        [brackets]. If no idea contains every word, ideas containing any word are returned
-        instead, and each result's `matched` field says which rule applied."""
+        Results are ranked best match first. Each has a snippet: the matching passage with
+        matched words in [brackets], or the opening of the problem when only the domain or
+        tags matched; `matched_fields` lists where the words were found. If no idea
+        contains every word, ideas containing any word are returned instead, and each
+        result's `matched` field says which rule applied."""
         with connection() as conn:
             hits = db.search_ideas(conn, query, domain=domain, limit=limit)
         return {"count": len(hits), "results": hits}

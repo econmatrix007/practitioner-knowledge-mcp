@@ -296,3 +296,45 @@ def test_scripts_end_to_end(isolated_env: Path) -> None:
     second = _run("seed_db.py", isolated_env)
     assert "Inserted: 0. Skipped (already present): 12." in second.stdout
     assert "Ideas stored: 12." in second.stdout
+
+
+# --- Snippets -------------------------------------------------------------------
+
+
+def test_snippet_prefers_matching_passage_from_idea_text(seeded: sqlite3.Connection) -> None:
+    (hit,) = db.search_ideas(seeded, "chokepoint")
+    assert "[chokepoint]" in hit["snippet"]
+    assert hit["snippet"] != "[chokepoint]"  # a passage, not just the matched word
+    assert {"title", "insight"} <= set(hit["matched_fields"])
+
+
+def test_domain_only_match_shows_problem_opening(seeded: sqlite3.Connection) -> None:
+    hits = db.search_ideas(seeded, "supply chain")
+    assert len(hits) == 3
+    for hit in hits:
+        assert hit["matched_fields"] == ["domain"]
+        assert "[supply]" not in hit["snippet"]  # no echo of the domain label
+        idea = db.get_idea(seeded, hit["id"])
+        assert idea is not None and idea["problem"].startswith(hit["snippet"].rstrip("."))
+
+
+def test_tags_only_match_never_shows_raw_json(seeded: sqlite3.Connection) -> None:
+    hits = db.search_ideas(seeded, "credibility")
+    tags_only = [h for h in hits if h["matched_fields"] == ["tags"]]
+    assert tags_only, "expected at least one idea matching only by tag"
+    for hit in tags_only:
+        assert not hit["snippet"].startswith('["')
+
+
+def test_snippets_contain_no_internal_markers(seeded: sqlite3.Connection) -> None:
+    for query in ("supply chain", "risk", "chokepoint", "credible commitment"):
+        for hit in db.search_ideas(seeded, query, limit=20):
+            assert "\x02" not in hit["snippet"] and "\x03" not in hit["snippet"]
+
+
+def test_long_problem_excerpt_is_trimmed(conn: sqlite3.Connection) -> None:
+    long_problem = " ".join(f"word{i}" for i in range(60))
+    db.create_idea(conn, title="Label only", domain="zzdomain", problem=long_problem, insight="x")
+    (hit,) = db.search_ideas(conn, "zzdomain")
+    assert hit["snippet"].endswith("...")
+    assert len(hit["snippet"].split()) == db.EXCERPT_WORDS
