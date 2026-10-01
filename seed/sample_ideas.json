@@ -3,7 +3,7 @@
     "title": "Corridor density follows transit frequency, not transit presence",
     "domain": "urban systems",
     "problem": "New transit lines often fail to attract the denser development planners expect along the route. Station areas stay underbuilt for a decade or more.",
-    "insight": "Developers price the reliability of access, not the existence of a line. Service that runs every 10 minutes changes land values; service that runs every 30 minutes rarely does. Frequency commitments written into long-term operating plans do more for corridor density than new stations.",
+    "insight": "Developers price the reliability of access, not the existence of a line. Frequent, dependable service can change land values; infrequent service often does not. Frequency commitments written into long-term operating plans do more for corridor density than new stations.",
     "assumptions": "Land markets capitalize travel-time savings. Zoning along the corridor already permits higher density. Operating funds are stable enough to make frequency commitments credible.",
     "tags": ["transit", "land value", "density", "credibility"],
     "status": "developing"
@@ -30,7 +30,7 @@
     "title": "Dual sourcing is insurance with a visible premium",
     "domain": "supply chains",
     "problem": "Firms resist adding a second supplier because the cost shows up every quarter while the benefit appears only during a disruption.",
-    "insight": "Treat the second supplier as an insurance contract. Price the premium as the unit-cost gap times the volume shifted, then compare it to the expected loss from a single-source outage. Framed this way, a 15 to 20 percent allocation to the backup often clears the bar.",
+    "insight": "Treat the second supplier as an insurance contract. Price the premium as the unit-cost gap times the volume shifted, then compare it to the expected loss from a single-source outage. Framed this way, a modest allocation to the backup can clear the bar, especially where outages are long or costly.",
     "assumptions": "Disruption probabilities can be estimated from history. The backup supplier is not exposed to the same shock as the primary.",
     "tags": ["resilience", "sourcing", "risk", "insurance"],
     "status": "developing"
