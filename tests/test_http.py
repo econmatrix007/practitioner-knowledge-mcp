@@ -40,16 +40,25 @@ def settings(**overrides: Any) -> Settings:
 @pytest.mark.parametrize("host", ["0.0.0.0", "::", ""])  # noqa: S104
 def test_refuses_all_interfaces_by_default(host: str) -> None:
     with pytest.raises(ConfigError, match="all interfaces"):
-        check_bind(settings(host=host))
+        check_bind(settings(host=host, token=TOKEN))
 
 
-def test_all_interfaces_needs_explicit_opt_in() -> None:
-    check_bind(settings(host="0.0.0.0", allow_all_interfaces=True))  # noqa: S104
+def test_all_interfaces_needs_opt_in_and_token() -> None:
+    check_bind(settings(host="0.0.0.0", allow_all_interfaces=True, token=TOKEN))  # noqa: S104
+    with pytest.raises(ConfigError, match="without a bearer token"):
+        check_bind(settings(host="0.0.0.0", allow_all_interfaces=True))  # noqa: S104
 
 
-@pytest.mark.parametrize("host", ["127.0.0.1", "100.101.102.103", "::1", "localhost"])
-def test_specific_addresses_are_allowed(host: str) -> None:
+@pytest.mark.parametrize("host", ["127.0.0.1", "::1", "localhost"])
+def test_loopback_works_without_token(host: str) -> None:
     check_bind(settings(host=host))
+
+
+@pytest.mark.parametrize("host", ["100.101.102.103", "fd7a:115c::1", "mini.example.ts.net"])
+def test_non_loopback_requires_token(host: str) -> None:
+    with pytest.raises(ConfigError, match="without a bearer token"):
+        check_bind(settings(host=host))
+    check_bind(settings(host=host, token=TOKEN))
 
 
 def test_loopback_detection() -> None:

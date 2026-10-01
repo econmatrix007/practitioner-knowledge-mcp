@@ -4,10 +4,12 @@ Three layers of protection, outermost first:
 
 1. Bind check. The server listens on 127.0.0.1 unless told otherwise, and refuses
    all-interfaces addresses (0.0.0.0, ::) unless KNOWLEDGE_MCP_ALLOW_ALL_INTERFACES=1.
+   It also refuses any address other than loopback unless a token is set.
 2. Host-header check (DNS rebinding protection), always on. Requests must name a
    host this server expects: localhost, the bind address, or KNOWLEDGE_MCP_ALLOWED_HOSTS.
-3. Optional bearer token (KNOWLEDGE_MCP_TOKEN or KNOWLEDGE_MCP_TOKEN_FILE). When set,
-   every request except GET /healthz must send `Authorization: Bearer <token>`.
+3. Bearer token (KNOWLEDGE_MCP_TOKEN or KNOWLEDGE_MCP_TOKEN_FILE): optional on
+   loopback, required on any other address. When set, every request except
+   GET /healthz must send `Authorization: Bearer <token>`.
 
 The MCP endpoint is /mcp. GET /healthz returns {"status": "ok"} and nothing else,
 so monitoring can check the server without a token.
@@ -36,12 +38,22 @@ LOOPBACK_NAMES = ("127.0.0.1", "localhost", "[::1]")
 
 
 def check_bind(settings: Settings) -> None:
-    """Refuse to listen on every interface unless explicitly allowed."""
+    """Refuse unsafe listen addresses before the server starts.
+
+    - All interfaces (0.0.0.0, ::) only with KNOWLEDGE_MCP_ALLOW_ALL_INTERFACES=1.
+    - Any address other than loopback only with a bearer token.
+    """
     if settings.host in ALL_INTERFACES and not settings.allow_all_interfaces:
         raise ConfigError(
             f"Refusing to listen on all interfaces ({settings.host!r}). Bind to 127.0.0.1 "
             "or a Tailscale address instead. To override, set "
             "KNOWLEDGE_MCP_ALLOW_ALL_INTERFACES=1 and use a token."
+        )
+    if not is_loopback(settings.host) and not settings.token:
+        raise ConfigError(
+            f"Refusing to listen on {settings.host!r} without a bearer token. Anyone who "
+            "can reach that address could read and write your ideas. Set "
+            "KNOWLEDGE_MCP_TOKEN_FILE (the launchd installer creates one for you)."
         )
 
 
@@ -106,12 +118,6 @@ def build_http_app(app: MCPServer, settings: Settings) -> Any:
     )
     if settings.token:
         asgi = BearerTokenMiddleware(asgi, settings.token)
-    elif not is_loopback(settings.host):
-        log.warning(
-            "No bearer token set while listening on %s. Anyone who can reach this address "
-            "can read and write your ideas. Set KNOWLEDGE_MCP_TOKEN_FILE.",
-            settings.host,
-        )
     return asgi
 
 
