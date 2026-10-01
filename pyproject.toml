@@ -1,6 +1,6 @@
 [project]
 name = "practitioner-knowledge-mcp"
-version = "0.1.0.dev0"
+version = "0.1.0"
 description = "A personal knowledge base for Claude, built for practitioners, not programmers."
 readme = "README.md"
 license = "Apache-2.0"

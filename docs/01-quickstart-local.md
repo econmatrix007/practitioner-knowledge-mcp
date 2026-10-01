@@ -30,7 +30,8 @@ command again.
 uv --version
 ```
 
-Expected: `uv 0.8` or newer. If you see `command not found`, install uv:
+Expected: `uv 0.8` or newer. **If you see a version number, uv is installed:
+skip to step 2.** Only if you see `command not found`, install uv:
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -156,5 +157,7 @@ Next: [connect Claude Desktop](02-connect-claude-desktop.md).
 |---|---|
 | `make: command not found` | Install the command line developer tools: `xcode-select --install` |
 | `uv: command not found` after installing | Open a new Terminal window so it picks up the new PATH |
+| `git clone` says `destination path ... already exists` | You downloaded it before. Use that copy: `cd ~/dev/practitioner-knowledge-mcp && git pull` |
 | `make install` fails while downloading | Check your internet connection and run it again |
 | `make smoke` shows FAIL | Read the server log printed below the results; see the [FAQ](faq.md) |
+| `make init-db` says `Ideas stored: 12` instead of 0 | A database from an earlier try is still there. That is fine; continue. |

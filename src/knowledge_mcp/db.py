@@ -261,6 +261,13 @@ def search_ideas(
     return []
 
 
+# FTS5 column order in ideas_fts. Snippets prefer the idea's text over its labels.
+FTS_COLUMNS = ("title", "domain", "problem", "insight", "assumptions", "tags")
+SNIPPET_PREFERENCE = ("problem", "insight", "assumptions", "title")
+OPEN, CLOSE = "\x02", "\x03"  # internal highlight markers; never present in stored text
+EXCERPT_WORDS = 20
+
+
 def _run_search(
     conn: sqlite3.Connection, match: str, domain: str | None, limit: int
 ) -> list[sqlite3.Row]:
@@ -270,25 +277,57 @@ def _run_search(
         domain_clause = "AND i.domain = ?"
         params.append(domain)
     params.append(limit)
+    # One highlighted snippet per column, using control characters as markers so a
+    # bracket that is already in the text (tags are stored as JSON) is never mistaken
+    # for a highlight. FTS_COLUMNS is a constant, so the f-string adds no user input.
+    snippets = ", ".join(
+        f"snippet(ideas_fts, {n}, char(2), char(3), '...', 16) AS s_{name}"
+        for n, name in enumerate(FTS_COLUMNS)
+    )
     # Column weights: title 5, domain 1, problem 2, insight 2, assumptions 1, tags 1.
     return conn.execute(
         f"""
-        SELECT i.id, i.title, i.domain, i.status, i.tags,
-               snippet(ideas_fts, -1, '[', ']', '...', 16) AS snippet,
+        SELECT i.id, i.title, i.domain, i.status, i.tags, i.problem, {snippets},
                bm25(ideas_fts, 5.0, 1.0, 2.0, 2.0, 1.0, 1.0) AS score
         FROM ideas_fts JOIN ideas AS i ON i.id = ideas_fts.rowid
         WHERE ideas_fts MATCH ? {domain_clause}
         ORDER BY score
         LIMIT ?
-        """,  # noqa: S608 - domain_clause is a fixed string
+        """,  # noqa: S608 - snippets and domain_clause are built from constants
         params,
     ).fetchall()
 
 
+def _snippet(row: sqlite3.Row) -> tuple[str, list[str]]:
+    """Pick the most useful snippet and list the fields that matched.
+
+    Prefers a highlighted passage from the problem, insight, assumptions, or title.
+    When only the domain or tags matched, a highlight would just repeat the label,
+    so the snippet is the opening of the problem statement instead.
+    """
+    matched = [name for name in FTS_COLUMNS if OPEN in (row[f"s_{name}"] or "")]
+    for name in SNIPPET_PREFERENCE:
+        if name in matched:
+            text = row[f"s_{name}"]
+            return text.replace(OPEN, "[").replace(CLOSE, "]"), matched
+    words = row["problem"].split()
+    excerpt = " ".join(words[:EXCERPT_WORDS]) + ("..." if len(words) > EXCERPT_WORDS else "")
+    return excerpt, matched
+
+
 def _search_hit(row: sqlite3.Row, matched: str) -> dict[str, Any]:
-    record = _row_to_dict(row)
-    record["score"] = round(-record["score"], 4)  # bm25 is negative; flip so higher is better
-    record["matched"] = matched
+    snippet, fields = _snippet(row)
+    record = {
+        "id": row["id"],
+        "title": row["title"],
+        "domain": row["domain"],
+        "status": row["status"],
+        "tags": json.loads(row["tags"]),
+        "snippet": snippet,
+        "matched_fields": fields,
+        "score": round(-row["score"], 4),  # bm25 is negative; flip so higher is better
+        "matched": matched,
+    }
     return record
 
 
