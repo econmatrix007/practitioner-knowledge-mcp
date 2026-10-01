@@ -1,0 +1,54 @@
+[project]
+name = "practitioner-knowledge-mcp"
+version = "0.1.0.dev0"
+description = "A personal knowledge base for Claude, built for practitioners, not programmers."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+]
+# Runtime dependencies are deliberately minimal (HANDOFF Section 8).
+# mcp 2.x renamed FastMCP to MCPServer; this project targets the 2.x API.
+dependencies = [
+    "mcp>=2.2,<3",
+    "pyyaml>=6.0.3,<7",
+]
+
+[project.scripts]
+knowledge-mcp = "knowledge_mcp.__main__:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.16.9",
+    "pre-commit>=4",
+]
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/knowledge_mcp"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+required-version = ">=0.16"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
