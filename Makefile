@@ -5,7 +5,7 @@ PYTHON_VERSION ?= 3.12
 UV ?= uv
 
 .DEFAULT_GOAL := help
-.PHONY: help install hooks lint format test guard check clean
+.PHONY: help install hooks lint format test guard check init-db seed clean
 
 help: ## List available targets
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-10s %s\n", $$1, $$2}'
@@ -35,6 +35,12 @@ guard: ## Fail if private or database files are tracked by git
 
 check: guard lint test ## Run every check; must pass before each commit
 	$(UV) run pre-commit run --all-files
+
+init-db: ## Create or upgrade the ideas database (KNOWLEDGE_MCP_DB or ~/.knowledge-mcp/ideas.db)
+	$(UV) run python scripts/init_db.py
+
+seed: ## Load the 12 fictional sample ideas (safe to run twice)
+	$(UV) run python scripts/seed_db.py
 
 clean: ## Remove caches and build output (keeps .venv and your data)
 	rm -rf .pytest_cache .ruff_cache build dist
