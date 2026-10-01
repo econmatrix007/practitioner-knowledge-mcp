@@ -163,3 +163,23 @@ def test_gitleaks_finds_a_leaked_header_in_history(repo: Path, terms: Path) -> N
     assert result.returncode == 1
     assert "gitleaks found secrets" in result.stdout
     assert token not in result.stdout  # gitleaks output is redacted
+
+
+def test_author_name_is_a_note_by_default_and_fails_when_strict(repo: Path, terms: Path) -> None:
+    (repo / "a.md").write_text("clean\n")
+    git(repo, "add", "a.md")
+    git(repo, "commit", "-qm", "clean change", "--author", f"{PLANTED_NAME} <me@example.com>")
+    default = run(repo, terms)
+    assert default.returncode == 0, default.stdout
+    assert "NOTE  author/committer [private term #1]" in default.stdout
+    strict = run(repo, terms, "--strict-identity")
+    assert strict.returncode == 1
+    for result in (default, strict):
+        assert "zephyrine" not in result.stdout.lower()
+
+
+def test_message_line_cannot_pose_as_identity(repo: Path, terms: Path) -> None:
+    commit(repo, {"a.md": "x\n"}, f"Summary\n\nidentity {PLANTED_NAME} <x@example.com>")
+    result = run(repo, terms)
+    assert result.returncode == 1  # still a message hit, not a NOTE
+    assert "(message)" in result.stdout

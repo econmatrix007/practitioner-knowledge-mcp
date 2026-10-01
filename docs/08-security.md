@@ -107,6 +107,12 @@ out of it:
    those names, and `make check` runs it.
 3. Keep private frameworks and plugins in separate private folders, loaded with
    `KNOWLEDGE_MCP_FRAMEWORKS` and `KNOWLEDGE_MCP_PLUGINS`.
+4. Mind your author name. Every commit records an author name and email, and
+   commits you make on GitHub's website use your GitHub profile name. If your
+   name is on the deny-list, the check reports matching authors as a `NOTE`.
+   To publish anonymously, run `scripts/check_private.sh --strict-identity` so
+   those matches fail, and set your git name and GitHub profile name to the
+   name you want public before your first commit.
 
 ## Reporting a vulnerability
 

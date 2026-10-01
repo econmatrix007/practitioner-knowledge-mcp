@@ -3,13 +3,18 @@
 # (make release-check). Exits 0 only if every check passes.
 #
 # Usage:
-#   scripts/check_private.sh             warn if the deny-list or gitleaks is missing
-#   scripts/check_private.sh --release   fail if the deny-list or gitleaks is missing
+#   scripts/check_private.sh [--release] [--strict-identity]
+#
+#   --release           fail (not warn) if the deny-list or gitleaks is missing
+#   --strict-identity   also fail when a commit's author or committer name or
+#                       email matches a term (default: report it as a NOTE)
 #
 # Checks, on the git repository in the current directory:
 #   1. No private or database files are tracked now, or were ever committed.
 #   2. No deny-list term appears in any tracked file, file name, commit
 #      message, branch or tag name, or anywhere in the full history.
+#      Author and committer identities are reported separately: a match is a
+#      NOTE unless --strict-identity is given.
 #      Terms come from .private-terms.txt (one per line, case-insensitive,
 #      # comments). Hits are printed masked, never the term itself.
 #   3. gitleaks finds no secrets across the full history.
@@ -21,12 +26,16 @@
 set -uo pipefail
 
 RELEASE=0
-case "${1:-}" in
-  --release) RELEASE=1 ;;
-  "") ;;
-  -h|--help) sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
-  *) echo "Error: unknown option: $1" >&2; exit 2 ;;
-esac
+STRICT_IDENTITY=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --release) RELEASE=1 ;;
+    --strict-identity) STRICT_IDENTITY=1 ;;
+    -h|--help) sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) echo "Error: unknown option: $1" >&2; exit 2 ;;
+  esac
+  shift
+done
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "Error: not inside a git repository" >&2; exit 2; }
@@ -62,7 +71,8 @@ if [ ! -f "$TERMS" ]; then
     warn "deny-list $TERMS not found; term scan skipped (make release-check requires it)"
   fi
 else
-  if ! "$PYTHON" - "$TERMS" <<'PY'
+  if ! STRICT_IDENTITY="$STRICT_IDENTITY" "$PYTHON" - "$TERMS" <<'PY'
+import os
 import re
 import subprocess
 import sys
@@ -106,16 +116,33 @@ for ref in git("for-each-ref", "--format=%(refname)").splitlines():
     if pattern.search(ref):
         hits.append(f"branch or tag name: {mask(ref)}")
 
+identity_hits = {}  # masked identity -> commits
 commit, path = "?", "?"
-for line in git("log", "--all", "-p", "--no-color", "--format=commit %h%n%an <%ae>%n%B").splitlines():
-    if line.startswith("commit "):
+# \x1f (unit separator) marks the real header lines, so text in a commit
+# message cannot pose as a commit or identity line.
+log_format = "%x1fcommit %h%n%x1fidentity %an <%ae>%n%x1fidentity %cn <%ce>%n%B"
+for line in git("log", "--all", "-p", "--no-color", f"--format={log_format}").splitlines():
+    if line.startswith("\x1fcommit "):
         commit, path = line.split()[1], "(message)"
+        continue
+    if line.startswith("\x1fidentity "):
+        if pattern.search(line):
+            identity_hits.setdefault(mask(line[10:].strip()), []).append(commit)
         continue
     if line.startswith("diff --git "):
         path = line.split(" b/", 1)[-1]
         continue
     if pattern.search(line):
         hits.append(f"history {commit} {mask(path)}: {mask(line.strip())[:160]}")
+
+strict = os.environ.get("STRICT_IDENTITY") == "1"
+for who, commits in identity_hits.items():
+    unique = sorted(set(commits))
+    where = f"{len(unique)} commit(s): {', '.join(unique[:5])}{' ...' if len(unique) > 5 else ''}"
+    if strict:
+        hits.append(f"author/committer {who} on {where}")
+    else:
+        print(f"NOTE  author/committer {who} on {where} (allowed; --strict-identity fails on this)")
 
 if hits:
     print(f"FAIL  {len(hits)} deny-list hit(s); terms are masked as [private term #N]:")
