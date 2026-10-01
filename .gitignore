@@ -1,0 +1,37 @@
+# --- Private: never commit (HANDOFF Section 1, rule 4) ---
+HANDOFF.md
+README_OUTLINE.md
+.private-terms.txt
+.env
+.env.*
+!.env.example
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.sqlite-*
+maintenance.toml
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Editors and macOS ---
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# --- Claude Code local settings (shared commands in .claude/commands/ are tracked) ---
+.claude/settings.local.json
