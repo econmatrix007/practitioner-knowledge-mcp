@@ -1,0 +1,23 @@
+# Private deny-list template.
+#
+# Copy this file to .private-terms.txt and list terms that must never appear
+# in this repository or its git history. The real file is gitignored.
+#
+#   cp .private-terms.example.txt .private-terms.txt
+#
+# Rules:
+#   - One term per line. Matching is case-insensitive.
+#   - Lines starting with # are comments. Blank lines are ignored.
+#   - Matched terms are masked when the check reports a hit.
+#
+# Good candidates:
+#   - client, employer, and partner names
+#   - city, county, authority, and agency names you work with
+#   - program, deal, and project code names
+#   - names of private tools or frameworks you built
+#   - the path to your private database or private repository
+#
+# Examples (fictional; delete these):
+example-client-name
+example-county-authority
+example-private-tool
