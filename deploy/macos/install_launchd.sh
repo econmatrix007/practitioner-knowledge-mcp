@@ -13,6 +13,7 @@
 #   --allowed-hosts LIST   Extra host names clients may use, comma-separated
 #                          (for example your Tailscale name)
 #   --db PATH              Database file (default ~/.knowledge-mcp/ideas.db)
+#   --plugins LIST         Plugin modules or .py paths, comma-separated
 #   --no-token             Do not require a bearer token (localhost only)
 #   --label NAME           launchd label (default com.example.knowledge-mcp)
 #   --dry-run              Print the rendered plist and stop; change nothing
@@ -35,6 +36,7 @@ LABEL="com.example.knowledge-mcp"
 HOST="127.0.0.1"
 PORT="8765"
 ALLOWED_HOSTS=""
+PLUGINS=""
 DB="$HOME/.knowledge-mcp/ideas.db"
 TOKEN_FILE="$HOME/.knowledge-mcp/token"
 USE_TOKEN=1
@@ -50,6 +52,7 @@ while [ $# -gt 0 ]; do
     --port) PORT="${2:?--port needs a value}"; shift 2 ;;
     --allowed-hosts) ALLOWED_HOSTS="${2:?--allowed-hosts needs a value}"; shift 2 ;;
     --db) DB="${2:?--db needs a value}"; shift 2 ;;
+    --plugins) PLUGINS="${2:?--plugins needs a value}"; shift 2 ;;
     --label) LABEL="${2:?--label needs a value}"; shift 2 ;;
     --no-token) USE_TOKEN=0; shift ;;
     --dry-run) DRY_RUN=1; shift ;;
@@ -68,6 +71,7 @@ render() {
   [ "$USE_TOKEN" = 1 ] && token_file="$TOKEN_FILE"
   LABEL="$LABEL" REPO="$REPO" DB="$DB" HOST="$HOST" PORT="$PORT" \
   TOKEN_FILE_VALUE="$token_file" ALLOWED_HOSTS="$ALLOWED_HOSTS" LOG_DIR="$LOG_DIR" \
+  PLUGINS="$PLUGINS" \
   "$PYTHON" - "$TEMPLATE" <<'PY'
 import os, plistlib, sys
 values = {
@@ -75,6 +79,7 @@ values = {
     "__DB__": os.environ["DB"], "__HOST__": os.environ["HOST"],
     "__PORT__": os.environ["PORT"], "__TOKEN_FILE__": os.environ["TOKEN_FILE_VALUE"],
     "__ALLOWED_HOSTS__": os.environ["ALLOWED_HOSTS"], "__LOG_DIR__": os.environ["LOG_DIR"],
+    "__PLUGINS__": os.environ["PLUGINS"],
 }
 def fill(obj):
     if isinstance(obj, str):
@@ -106,7 +111,7 @@ preflight() {
   fi
   KNOWLEDGE_MCP_DB="$DB" KNOWLEDGE_MCP_HOST="$HOST" KNOWLEDGE_MCP_PORT="$PORT" \
   KNOWLEDGE_MCP_TOKEN_FILE="$token_file" KNOWLEDGE_MCP_TOKEN="$token_value" \
-  KNOWLEDGE_MCP_ALLOWED_HOSTS="$ALLOWED_HOSTS" \
+  KNOWLEDGE_MCP_ALLOWED_HOSTS="$ALLOWED_HOSTS" KNOWLEDGE_MCP_PLUGINS="$PLUGINS" \
   "$PYTHON" -c '
 import sys
 from knowledge_mcp.config import ConfigError, load_settings

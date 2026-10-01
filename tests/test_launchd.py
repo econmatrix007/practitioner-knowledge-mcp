@@ -32,6 +32,7 @@ def test_defaults_keep_service_local_and_restarting() -> None:
     assert env["KNOWLEDGE_MCP_PORT"] == "8765"
     assert env["KNOWLEDGE_MCP_TOKEN_FILE"].endswith("/.knowledge-mcp/token")
     assert "KNOWLEDGE_MCP_ALLOWED_HOSTS" not in env  # empty entries are dropped
+    assert "KNOWLEDGE_MCP_PLUGINS" not in env
     assert plist["KeepAlive"] is True and plist["RunAtLoad"] is True
     assert plist["ProgramArguments"][1:] == ["--transport", "http"]
     assert plist["ProgramArguments"][0].endswith("/.venv/bin/knowledge-mcp")
@@ -97,3 +98,9 @@ def test_unsafe_config_is_refused_with_a_clear_message(args: tuple[str, ...], me
 def test_tailscale_address_with_token_is_accepted() -> None:
     env = render("--host", "100.101.102.103")["EnvironmentVariables"]
     assert env["KNOWLEDGE_MCP_HOST"] == "100.101.102.103"
+
+
+def test_plugins_are_passed_to_the_service() -> None:
+    plugin = str(config.REPO_ROOT / "examples" / "example_plugin.py")
+    env = render("--plugins", plugin)["EnvironmentVariables"]
+    assert env["KNOWLEDGE_MCP_PLUGINS"] == plugin

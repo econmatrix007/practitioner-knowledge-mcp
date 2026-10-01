@@ -33,6 +33,8 @@
     <string>__TOKEN_FILE__</string>
     <key>KNOWLEDGE_MCP_ALLOWED_HOSTS</key>
     <string>__ALLOWED_HOSTS__</string>
+    <key>KNOWLEDGE_MCP_PLUGINS</key>
+    <string>__PLUGINS__</string>
   </dict>
 
   <!-- Start at login and restart whenever the process exits. -->
