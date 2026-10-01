@@ -75,3 +75,25 @@ def test_bad_arguments_fail_clearly(args: tuple[str, ...]) -> None:
     result = run(*args)
     assert result.returncode != 0
     assert "Traceback" not in result.stderr
+
+
+@pytest.mark.parametrize(
+    ("args", "message"),
+    [
+        (("--host", "0.0.0.0"), "all interfaces"),  # noqa: S104
+        (("--host", "100.101.102.103", "--no-token"), "without a bearer token"),
+        (("--port", "99999"), "KNOWLEDGE_MCP_PORT"),
+    ],
+)
+def test_unsafe_config_is_refused_with_a_clear_message(args: tuple[str, ...], message: str) -> None:
+    result = run("install", "server", "--dry-run", *args)
+    assert result.returncode != 0
+    assert message in result.stderr
+    assert "Nothing was installed" in result.stderr
+    assert "Traceback" not in result.stderr
+    assert result.stdout == ""  # no plist rendered
+
+
+def test_tailscale_address_with_token_is_accepted() -> None:
+    env = render("--host", "100.101.102.103")["EnvironmentVariables"]
+    assert env["KNOWLEDGE_MCP_HOST"] == "100.101.102.103"

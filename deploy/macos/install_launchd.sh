@@ -98,15 +98,24 @@ PY
 
 preflight() {
   # Run the server's own config checks with the same settings launchd will use.
-  local token_env=""
-  [ "$USE_TOKEN" = 1 ] && token_env="$TOKEN_FILE"
+  # In a dry run the token file may not exist yet, so a placeholder token stands in.
+  local token_file="" token_value=""
+  if [ "$USE_TOKEN" = 1 ]; then
+    if [ "$DRY_RUN" = 1 ]; then token_value="dry-run-placeholder-token-0000000000"
+    else token_file="$TOKEN_FILE"; fi
+  fi
   KNOWLEDGE_MCP_DB="$DB" KNOWLEDGE_MCP_HOST="$HOST" KNOWLEDGE_MCP_PORT="$PORT" \
-  KNOWLEDGE_MCP_TOKEN_FILE="$token_env" KNOWLEDGE_MCP_ALLOWED_HOSTS="$ALLOWED_HOSTS" \
+  KNOWLEDGE_MCP_TOKEN_FILE="$token_file" KNOWLEDGE_MCP_TOKEN="$token_value" \
+  KNOWLEDGE_MCP_ALLOWED_HOSTS="$ALLOWED_HOSTS" \
   "$PYTHON" -c '
-from knowledge_mcp.config import load_settings
+import sys
+from knowledge_mcp.config import ConfigError, load_settings
 from knowledge_mcp.http_server import check_bind
-check_bind(load_settings())
-' || die "configuration rejected (see message above). Nothing was installed."
+try:
+    check_bind(load_settings())
+except ConfigError as exc:
+    sys.exit(f"Error: {exc}")
+' || die "configuration rejected. Nothing was installed."
 }
 
 make_token() {
@@ -141,6 +150,7 @@ wait_healthy() {
 case "$ACTION" in
   install)
     if [ "$DRY_RUN" = 1 ]; then
+      preflight
       render
       exit 0
     fi
