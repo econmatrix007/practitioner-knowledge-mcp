@@ -1,0 +1,30 @@
+# Install the hooks once per clone:  make hooks
+# Run them on demand:               uv run pre-commit run --all-files
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.9
+    hooks:
+      - id: ruff-check
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: forbid-new-submodules
+
+  - repo: local
+    hooks:
+      - id: forbid-private-files
+        name: forbid private and database files
+        language: fail
+        entry: "Private or database file staged. See .gitignore and HANDOFF Section 1."
+        files: '(^|/)(HANDOFF\.md|\.private-terms\.txt|\.env)$|\.(db|sqlite|sqlite3)$|^data/'
