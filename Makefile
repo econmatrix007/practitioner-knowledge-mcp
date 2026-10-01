@@ -6,7 +6,7 @@ UV ?= uv
 INSPECTOR ?= @modelcontextprotocol/inspector@2.9.0
 
 .DEFAULT_GOAL := help
-.PHONY: help install hooks lint format test privacy check release-check init-db seed run-stdio run-http inspect smoke frameworks clean
+.PHONY: help install hooks lint format test privacy check release-check init-db seed run-stdio run-http inspect smoke frameworks checkup clean
 
 help: ## List available targets
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-10s %s\n", $$1, $$2}'
@@ -62,6 +62,9 @@ smoke: ## Launch the server like Claude Desktop does and test every read-only to
 
 frameworks: ## List the frameworks the server can see
 	@$(UV) run python scripts/list_frameworks.py
+
+checkup: ## Run the maintenance checkup now (reports only; never upgrades). ARGS="--offline" etc.
+	$(UV) run python -m knowledge_mcp.checkup $(ARGS)
 
 clean: ## Remove caches and build output (keeps .venv and your data)
 	rm -rf .pytest_cache .ruff_cache build dist
