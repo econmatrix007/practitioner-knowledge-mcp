@@ -18,7 +18,7 @@ from knowledge_mcp.server import create_server
 REPO = config.REPO_ROOT
 README = REPO / "README.md"
 DOCS = sorted((REPO / "docs").glob("*.md"))
-COMMUNITY = [REPO / n for n in ("SECURITY.md", "SUPPORT.md", "CONTRIBUTING.md")]
+COMMUNITY = [REPO / n for n in ("SECURITY.md", "SUPPORT.md", "CONTRIBUTING.md", "CHANGELOG.md")]
 PAGES = [README, *DOCS, *COMMUNITY]
 
 # Files the docs link to before they exist. Empty once every phase has landed.
