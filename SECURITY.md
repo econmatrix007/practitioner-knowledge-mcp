@@ -6,7 +6,7 @@ Please report security problems privately. Do not open a public issue.
 
 1. **Preferred:** use GitHub's private reporting. On the repository page, open
    the **Security** tab and click **Report a vulnerability**.
-2. **Or email:** SECURITY_CONTACT_EMAIL
+2. **Or email:** econmatrix@gmail.com
 
 Include what you found, how to reproduce it, and what an attacker could do
 with it. You will get an acknowledgment when the maintainer sees the report.

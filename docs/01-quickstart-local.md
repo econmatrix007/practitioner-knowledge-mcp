@@ -48,7 +48,7 @@ with your Mac.
 
 ```bash
 mkdir -p ~/dev && cd ~/dev
-git clone https://github.com/OWNER/practitioner-knowledge-mcp.git
+git clone https://github.com/econmatrix007/practitioner-knowledge-mcp.git
 cd practitioner-knowledge-mcp
 ```
 

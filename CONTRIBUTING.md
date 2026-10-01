@@ -28,7 +28,7 @@ focused pull requests are the easiest to review and the most likely to merge.
 ## Set up
 
 ```bash
-git clone https://github.com/OWNER/practitioner-knowledge-mcp.git
+git clone https://github.com/econmatrix007/practitioner-knowledge-mcp.git
 cd practitioner-knowledge-mcp
 make install
 make hooks

@@ -65,4 +65,4 @@ for practitioners rather than programmers.
 - One user per database. There are no accounts or permissions.
 - No import, export, or tag-management tools yet (see the roadmap in the README).
 
-[0.1.0]: https://github.com/OWNER/practitioner-knowledge-mcp/releases/tag/v0.1.0
+[0.1.0]: https://github.com/econmatrix007/practitioner-knowledge-mcp/releases/tag/v0.1.0

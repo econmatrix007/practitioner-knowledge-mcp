@@ -155,3 +155,11 @@ def test_claude_config_edits_say_quit_first() -> None:
     quit_at = guide.index("quit Claude Desktop completely")
     assert quit_at < guide.index("python3 - <<'PYEOF'"), "quit must come before the edit"
     assert "regular new chat" in guide
+
+
+def test_no_publish_placeholders_remain() -> None:
+    """Section 10 decisions are filled in; make release-check enforces the same rule."""
+    pages = [*PAGES, REPO / "CODE_OF_CONDUCT.md", REPO / ".github" / "FUNDING.yml"]
+    for page in pages:
+        text = page.read_text()
+        assert not re.search(r"\bOWNER\b|SECURITY_CONTACT_EMAIL", text), page.name
