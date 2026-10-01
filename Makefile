@@ -6,7 +6,7 @@ UV ?= uv
 INSPECTOR ?= @modelcontextprotocol/inspector@2.9.0
 
 .DEFAULT_GOAL := help
-.PHONY: help install hooks lint format test guard check init-db seed run-stdio run-http inspect smoke frameworks clean
+.PHONY: help install hooks lint format test privacy check release-check init-db seed run-stdio run-http inspect smoke frameworks clean
 
 help: ## List available targets
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-10s %s\n", $$1, $$2}'
@@ -28,14 +28,18 @@ format: ## Auto-fix code style
 test: ## Run the test suite
 	$(UV) run pytest
 
-# Minimal guard until scripts/check_private.sh lands in Phase 7.
-guard: ## Fail if private or database files are tracked by git
-	@bad=$$(git ls-files | grep -E '(^|/)(HANDOFF\.md|\.private-terms\.txt|\.env)$$|\.(db|sqlite|sqlite3)$$|^data/' || true); \
-	if [ -n "$$bad" ]; then echo "Tracked private files:"; echo "$$bad"; exit 1; fi; \
-	echo "guard: no private files tracked"
+privacy: ## Privacy check: private files, deny-list terms, and secrets in full history
+	@scripts/check_private.sh
 
-check: guard lint test ## Run every check; must pass before each commit
+check: privacy lint test ## Run every check; must pass before each commit
 	$(UV) run pre-commit run --all-files
+
+release-check: ## Strict checks for publishing: deny-list, gitleaks, no placeholders left
+	@scripts/check_private.sh --release
+	@if git grep -nwE 'OWNER|SECURITY_CONTACT_EMAIL' -- ':!tests' ':!Makefile'; then \
+		echo "FAIL  replace the placeholders above before publishing (HANDOFF Section 10)"; exit 1; \
+	else echo "PASS  no OWNER or SECURITY_CONTACT_EMAIL placeholders left"; fi
+	@$(MAKE) --no-print-directory check
 
 init-db: ## Create or upgrade the ideas database (KNOWLEDGE_MCP_DB or ~/.knowledge-mcp/ideas.db)
 	$(UV) run python scripts/init_db.py
