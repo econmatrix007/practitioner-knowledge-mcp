@@ -1,0 +1,110 @@
+[
+  {
+    "title": "Corridor density follows transit frequency, not transit presence",
+    "domain": "urban systems",
+    "problem": "New transit lines often fail to attract the denser development planners expect along the route. Station areas stay underbuilt for a decade or more.",
+    "insight": "Developers price the reliability of access, not the existence of a line. Frequent, dependable service can change land values; infrequent service often does not. Frequency commitments written into long-term operating plans do more for corridor density than new stations.",
+    "assumptions": "Land markets capitalize travel-time savings. Zoning along the corridor already permits higher density. Operating funds are stable enough to make frequency commitments credible.",
+    "tags": ["transit", "land value", "density", "credibility"],
+    "status": "developing"
+  },
+  {
+    "title": "Parking minimums act as a hidden tax on small infill lots",
+    "domain": "urban systems",
+    "problem": "Small parcels in established neighborhoods sit vacant even when demand for housing is strong.",
+    "insight": "Required parking consumes a fixed share of a small lot, so the per-unit cost of compliance rises as lot size falls. Removing minimums on lots below a size threshold unlocks infill without changing the rules for large projects.",
+    "assumptions": "Lenders will finance projects with little or no on-site parking. Street parking is managed well enough to absorb some spillover.",
+    "tags": ["zoning", "housing", "infill", "regulation"],
+    "status": "mature"
+  },
+  {
+    "title": "Stormwater fees create a market for permeable surfaces",
+    "domain": "urban systems",
+    "problem": "Cities struggle to fund drainage upgrades while property owners have no reason to reduce runoff.",
+    "insight": "A fee based on impervious area turns runoff into a priced externality. Credits for green roofs and permeable paving let owners choose the cheapest abatement, and the fee base funds the remaining public work.",
+    "assumptions": "Impervious area can be measured cheaply from aerial imagery. Credits are verified often enough to stay honest.",
+    "tags": ["infrastructure", "externalities", "incentives", "resilience"],
+    "status": "seed"
+  },
+  {
+    "title": "Dual sourcing is insurance with a visible premium",
+    "domain": "supply chains",
+    "problem": "Firms resist adding a second supplier because the cost shows up every quarter while the benefit appears only during a disruption.",
+    "insight": "Treat the second supplier as an insurance contract. Price the premium as the unit-cost gap times the volume shifted, then compare it to the expected loss from a single-source outage. Framed this way, a modest allocation to the backup can clear the bar, especially where outages are long or costly.",
+    "assumptions": "Disruption probabilities can be estimated from history. The backup supplier is not exposed to the same shock as the primary.",
+    "tags": ["resilience", "sourcing", "risk", "insurance"],
+    "status": "developing"
+  },
+  {
+    "title": "Inventory buffers belong at the chokepoint, not everywhere",
+    "domain": "supply chains",
+    "problem": "After a shortage, firms add safety stock across the whole network, tying up working capital with little gain in resilience.",
+    "insight": "Map which single node, if lost, stops the most downstream output. Concentrate buffers there. A small stock at a true chokepoint protects more output than a large stock spread evenly.",
+    "assumptions": "The network map is accurate. Chokepoints are stable over the planning horizon.",
+    "tags": ["resilience", "inventory", "network analysis", "working capital"],
+    "status": "mature"
+  },
+  {
+    "title": "Supplier lead-time variance matters more than average lead time",
+    "domain": "supply chains",
+    "problem": "Procurement teams choose suppliers on average delivery time and are surprised by stockouts.",
+    "insight": "Safety stock scales with the variance of lead time, not its mean. A slower but predictable supplier can need less buffer than a faster, erratic one. Score suppliers on both.",
+    "assumptions": "Demand is roughly stable over the lead time. Delivery records are complete enough to estimate variance.",
+    "tags": ["measurement", "sourcing", "inventory", "risk"],
+    "status": "seed"
+  },
+  {
+    "title": "Capital budgets should report maintenance backlog as debt",
+    "domain": "public finance",
+    "problem": "Governments defer maintenance to balance budgets, and the deferred cost never appears on any balance sheet.",
+    "insight": "Deferred maintenance behaves like borrowing: it shifts cost to future years, usually at a higher price. Reporting the backlog alongside bonded debt makes the trade-off visible to councils and rating analysts.",
+    "assumptions": "Asset condition can be assessed consistently. Officials respond to what appears in standard reports.",
+    "tags": ["infrastructure", "budgeting", "transparency", "measurement"],
+    "status": "developing"
+  },
+  {
+    "title": "Incentive clawbacks work only when milestones are observable",
+    "domain": "public finance",
+    "problem": "Development incentives often include clawback clauses that are almost never enforced.",
+    "insight": "Clawbacks fail when the trigger depends on data the public agency cannot see, such as private payroll. Tie disbursements to milestones that are verifiable from public records, like permits issued or assessed value, and release funds in tranches.",
+    "assumptions": "The agency has staff to monitor milestones. Recipients cannot easily game the chosen indicator.",
+    "tags": ["incentives", "contracts", "credibility", "measurement"],
+    "status": "mature"
+  },
+  {
+    "title": "Revenue volatility, not revenue level, drives reserve policy",
+    "domain": "public finance",
+    "problem": "Jurisdictions set reserve targets as a flat share of spending regardless of how volatile their revenues are.",
+    "insight": "A jurisdiction that depends on sales or income taxes faces larger swings than one that depends on property tax. Size reserves to cover a plausible downturn in the most volatile revenue stream, not a fixed percentage.",
+    "assumptions": "Historical revenue data captures the range of likely downturns. Reserves are protected from routine spending pressure.",
+    "tags": ["budgeting", "risk", "resilience", "insurance"],
+    "status": "seed"
+  },
+  {
+    "title": "Pre-commitment beats flexibility when rivals are watching",
+    "domain": "strategy",
+    "problem": "Organizations value keeping options open, yet rivals often read flexibility as weakness and move first.",
+    "insight": "A visible, costly commitment, such as building capacity in advance, can deter a rival's entry. Flexibility pays when uncertainty is about nature; commitment pays when uncertainty is about the rival's response.",
+    "assumptions": "The rival observes the commitment and believes it is hard to reverse. Both sides are roughly rational.",
+    "tags": ["game theory", "credibility", "commitment", "competition"],
+    "status": "developing"
+  },
+  {
+    "title": "Plans fail at the handoffs, so stress-test the seams",
+    "domain": "strategy",
+    "problem": "Review processes examine each part of a plan on its own and miss failures that occur between teams or phases.",
+    "insight": "List every point where responsibility passes from one owner to another. For each, ask what information is lost and who notices if it is late. Most avoidable failures surface at these seams.",
+    "assumptions": "Owners for each phase are clearly named. The review team has authority to change the plan.",
+    "tags": ["risk", "pre-mortem", "execution", "contracts"],
+    "status": "mature"
+  },
+  {
+    "title": "Count the crises that did not happen before judging a policy",
+    "domain": "strategy",
+    "problem": "Evaluations study cases where a policy visibly failed or succeeded and ignore the cases where nothing happened.",
+    "insight": "If the policy works by deterrence or prevention, its successes are invisible. Build the comparison set from all exposed cases, including quiet ones, or the evaluation will understate the policy's effect.",
+    "assumptions": "Exposed cases can be identified before outcomes are known. Quiet cases are recorded somewhere.",
+    "tags": ["measurement", "selection bias", "evaluation", "game theory"],
+    "status": "seed"
+  }
+]

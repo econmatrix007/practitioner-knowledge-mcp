@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "practitioner-knowledge": {
+      "command": "/opt/homebrew/bin/npx",
+      "args": [
+        "-y",
+        "mcp-remote@0.14.3",
+        "http://100.101.102.103:8765/mcp",
+        "--transport",
+        "http-only",
+        "--allow-http",
+        "--header-file",
+        "/ABSOLUTE/PATH/TO/HOME/.knowledge-mcp/remote-headers"
+      ]
+    }
+  }
+}

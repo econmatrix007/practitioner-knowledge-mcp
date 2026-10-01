@@ -1,0 +1,31 @@
+# Maintenance policy for the weekly checkup.
+#
+# Copy to ~/.knowledge-mcp/maintenance.toml and edit:
+#   cp maintenance.example.toml ~/.knowledge-mcp/maintenance.toml
+#
+# The checkup reads this file. It never installs or upgrades anything; it
+# proposes dates and writes tickets. See docs/09-maintenance-and-upgrades.md.
+
+[schedule]
+checkup_day = "Monday"        # weekday the checkup runs (launchd)
+checkup_time = "08:00"        # 24-hour local time
+migration_day = "Saturday"    # preferred day to propose migrations
+migration_time = "10:00"
+migration_duration_minutes = 60
+
+[soak_days]                   # wait after a release before proposing it
+patch = 7
+minor = 14
+major = 30                    # majors also require a human-written plan
+
+[blackout]                    # never propose migrations in these windows
+dates = ["2026-12-20:2027-01-04"]
+
+[backup]
+before_checkup = true         # run scripts/backup_db.sh at the start of each checkup
+keep_last = 12
+
+[project]
+# GitHub "owner/name" used to look up this project's releases.
+# Leave empty to read it from the git remote named origin.
+repo = ""

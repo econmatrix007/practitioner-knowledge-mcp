@@ -1,0 +1,14 @@
+# gitleaks configuration: all built-in rules, plus one rule for this project.
+# Used by the pre-commit hook, scripts/check_private.sh, and the secret-scan workflow.
+
+title = "practitioner-knowledge-mcp"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "knowledge-mcp-bearer-header"
+description = "A bearer token line, as in ~/.knowledge-mcp/remote-headers"
+regex = '''(?i)authorization:\s*bearer\s+([A-Za-z0-9_\-]{24,})'''
+secretGroup = 1
+keywords = ["bearer"]

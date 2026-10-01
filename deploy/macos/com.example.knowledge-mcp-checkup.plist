@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  launchd template for the weekly maintenance checkup.
+  deploy/macos/install_launchd.sh install checkup fills every __PLACEHOLDER__,
+  reading the day and time from your maintenance policy file.
+  The checkup never installs or upgrades anything.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>__LABEL__</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>__REPO__/.venv/bin/python</string>
+    <string>-m</string>
+    <string>knowledge_mcp.checkup</string>
+    <string>--policy</string>
+    <string>__POLICY__</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>__REPO__</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>KNOWLEDGE_MCP_DB</key>
+    <string>__DB__</string>
+  </dict>
+
+  <!-- Weekly. If the Mac is asleep at that moment, launchd runs it on wake. -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Weekday</key>
+    <string>__WEEKDAY__</string>
+    <key>Hour</key>
+    <string>__HOUR__</string>
+    <key>Minute</key>
+    <string>__MINUTE__</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <false/>
+
+  <key>StandardOutPath</key>
+  <string>__LOG_DIR__/checkup.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>__LOG_DIR__/checkup.err.log</string>
+</dict>
+</plist>
