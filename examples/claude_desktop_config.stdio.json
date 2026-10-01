@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "practitioner-knowledge": {
+      "command": "/ABSOLUTE/PATH/TO/uv",
+      "args": [
+        "--directory",
+        "/ABSOLUTE/PATH/TO/practitioner-knowledge-mcp",
+        "run",
+        "knowledge-mcp",
+        "--transport",
+        "stdio"
+      ],
+      "env": {
+        "KNOWLEDGE_MCP_DB": "/ABSOLUTE/PATH/TO/HOME/.knowledge-mcp/ideas.db"
+      }
+    }
+  }
+}

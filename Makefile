@@ -3,9 +3,10 @@
 
 PYTHON_VERSION ?= 3.12
 UV ?= uv
+INSPECTOR ?= @modelcontextprotocol/inspector@2.9.0
 
 .DEFAULT_GOAL := help
-.PHONY: help install hooks lint format test guard check init-db seed clean
+.PHONY: help install hooks lint format test guard check init-db seed run-stdio inspect clean
 
 help: ## List available targets
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-10s %s\n", $$1, $$2}'
@@ -41,6 +42,13 @@ init-db: ## Create or upgrade the ideas database (KNOWLEDGE_MCP_DB or ~/.knowled
 
 seed: ## Load the 12 fictional sample ideas (safe to run twice)
 	$(UV) run python scripts/seed_db.py
+
+run-stdio: ## Run the server over stdio (what Claude Desktop launches); Ctrl-C to stop
+	$(UV) run knowledge-mcp --transport stdio
+
+# The server defaults to stdio, so the Inspector gets a command with no flags to misparse.
+inspect: ## Open MCP Inspector in your browser, connected to this server (needs Node.js)
+	npx -y $(INSPECTOR) $(UV) run knowledge-mcp
 
 clean: ## Remove caches and build output (keeps .venv and your data)
 	rm -rf .pytest_cache .ruff_cache build dist
