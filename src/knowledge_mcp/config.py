@@ -6,6 +6,10 @@ Every value has a default. Set an environment variable to override it.
 |------------------|----------------------------|-----------------------------|
 | Database file    | KNOWLEDGE_MCP_DB           | ~/.knowledge-mcp/ideas.db   |
 | Frameworks folder| KNOWLEDGE_MCP_FRAMEWORKS   | <repo>/frameworks           |
+| Plugin modules   | KNOWLEDGE_MCP_PLUGINS      | (none)                      |
+
+KNOWLEDGE_MCP_PLUGINS is a comma-separated list of Python module names
+(`my_tools.extra`) or paths to .py files (`~/my-tools/extra.py`).
 """
 
 from __future__ import annotations
@@ -29,6 +33,7 @@ MAX_TAGS = 20
 MAX_TAG_LENGTH = 50
 MAX_QUERY = 500
 MAX_LIMIT = 100
+MAX_FRAMEWORK_BYTES = 200_000
 
 STATUSES = ("seed", "developing", "mature", "published", "archived")
 
@@ -37,13 +42,16 @@ STATUSES = ("seed", "developing", "mature", "published", "archived")
 class Settings:
     db_path: Path
     frameworks_dir: Path
+    plugins: tuple[str, ...] = ()
 
 
 def load_settings() -> Settings:
     """Read settings from the environment, falling back to defaults."""
     db = os.environ.get("KNOWLEDGE_MCP_DB")
     fw = os.environ.get("KNOWLEDGE_MCP_FRAMEWORKS")
+    plugins = os.environ.get("KNOWLEDGE_MCP_PLUGINS", "")
     return Settings(
         db_path=Path(db).expanduser() if db else DEFAULT_DB_PATH,
         frameworks_dir=Path(fw).expanduser() if fw else DEFAULT_FRAMEWORKS_DIR,
+        plugins=tuple(p.strip() for p in plugins.split(",") if p.strip()),
     )
