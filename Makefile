@@ -6,7 +6,7 @@ UV ?= uv
 INSPECTOR ?= @modelcontextprotocol/inspector@2.9.0
 
 .DEFAULT_GOAL := help
-.PHONY: help install hooks lint format test guard check init-db seed run-stdio inspect smoke clean
+.PHONY: help install hooks lint format test guard check init-db seed run-stdio run-http inspect smoke clean
 
 help: ## List available targets
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-10s %s\n", $$1, $$2}'
@@ -45,6 +45,9 @@ seed: ## Load the 12 fictional sample ideas (safe to run twice)
 
 run-stdio: ## Run the server over stdio (what Claude Desktop launches); Ctrl-C to stop
 	$(UV) run knowledge-mcp --transport stdio
+
+run-http: ## Run the HTTP server in this Terminal (127.0.0.1:8765 unless KNOWLEDGE_MCP_* set)
+	$(UV) run knowledge-mcp --transport http
 
 # The server defaults to stdio, so the Inspector gets a command with no flags to misparse.
 inspect: ## Open MCP Inspector in your browser, connected to this server (needs Node.js)
