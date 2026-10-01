@@ -3,7 +3,7 @@
 **A personal knowledge base for Claude, built for practitioners, not programmers.**
 
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![CI](https://github.com/OWNER/practitioner-knowledge-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/practitioner-knowledge-mcp/actions/workflows/ci.yml)
+[![CI](https://github.com/econmatrix007/practitioner-knowledge-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/econmatrix007/practitioner-knowledge-mcp/actions/workflows/ci.yml)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/)
 [![MCP Python SDK 2.x](https://img.shields.io/badge/MCP%20SDK-2.x-green.svg)](https://modelcontextprotocol.io/)
 
@@ -109,7 +109,7 @@ project and keeps it separate from anything else on your Mac.
 
 ```bash
 mkdir -p ~/dev && cd ~/dev
-git clone https://github.com/OWNER/practitioner-knowledge-mcp.git
+git clone https://github.com/econmatrix007/practitioner-knowledge-mcp.git
 cd practitioner-knowledge-mcp
 make install
 ```
@@ -180,12 +180,13 @@ for this server looks like
 }
 ```
 
-[docs/02-connect-claude-desktop.md](docs/02-connect-claude-desktop.md) has a
-one-paste command that adds this entry for you, fills in your paths, keeps any
-servers you already have, and backs up the file first.
+Quit Claude Desktop with **Cmd-Q** first: an open Claude Desktop can write its
+own copy of the file back and drop your change. Then use the one-paste command in
+[docs/02-connect-claude-desktop.md](docs/02-connect-claude-desktop.md). It adds
+this entry for you, fills in your paths, keeps any servers you already have, and
+backs up the file first.
 
-Then quit Claude Desktop with **Cmd-Q** (closing the window is not enough) and
-reopen it. In a new chat, ask:
+Reopen Claude Desktop. In a regular new chat, ask:
 
 > Use practitioner-knowledge to search my ideas for supply chain.
 
@@ -352,13 +353,14 @@ questions, use the setup help issue template rather than a bug report.
 ## Support this project
 
 If this kit saves you time, you can sponsor its upkeep through
-[GitHub Sponsors](https://github.com/sponsors/OWNER). Sponsorships are not
+[GitHub Sponsors](https://github.com/sponsors/econmatrix007). Sponsorships are not
 tax-deductible donations, and they do not buy support or change its terms:
 help is best effort, as described in [SUPPORT.md](SUPPORT.md).
 
 ## License, acknowledgments, disclaimer
 
-Licensed under the [Apache License 2.0](LICENSE).
+Created and maintained by ArtemisLogic. Licensed under the
+[Apache License 2.0](LICENSE).
 
 Built on the [Model Context Protocol](https://modelcontextprotocol.io) and its
 official Python SDK, with [uv](https://docs.astral.sh/uv/),

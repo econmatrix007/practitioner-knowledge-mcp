@@ -209,7 +209,8 @@ Rather than edit JSON by hand, this command adds the entry for you. It backs up
 your config first, leaves every other server untouched, and refuses to
 overwrite an existing `practitioner-knowledge` entry.
 
-**On the Laptop.** Replace `MINI_IP` on the first line, then paste the whole
+**On the Laptop**, first quit Claude Desktop with **Cmd-Q**, so it cannot write
+its own copy of the file back. Replace `MINI_IP` on the first line, then paste the whole
 block at once:
 
 ```bash
@@ -251,7 +252,7 @@ Why each argument is there:
 | `--allow-http` | mcp-remote expects HTTPS by default. Tailscale already encrypts this link. |
 | `--header-file` | Reads the token from the file you made in Step 5. |
 
-Quit Claude Desktop completely with **Cmd-Q**, then reopen it.
+Open Claude Desktop again.
 
 ## Step 8. Test from the Laptop
 
